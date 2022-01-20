@@ -12,7 +12,7 @@ const typeDefs = gql`
         name: String!
         email: String!
         password: String!
-        group: [Group]
+        group: Group
         matchHistory: [MatchPost]
     }
 
@@ -57,6 +57,7 @@ const typeDefs = gql`
         name: String!,
         email: String!,
         password: String!
+        group: String
         ) : AuthUser!
     }
 

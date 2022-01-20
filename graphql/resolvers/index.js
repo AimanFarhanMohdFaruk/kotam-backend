@@ -48,7 +48,10 @@ const resolvers  = {
     Mutation:{
         signUp: async (_, data, {db}) => {
             const hashedPassword = bcrypt.hashSync(data.password, 10)
-            const user = {...data, password: hashedPassword}
+            const group = await db.collection("Group").findOne({groupName: data.group})
+
+
+            const user = {...data, password: hashedPassword, group: group}
             
             //check email
             const existingUser = await db.collection("Users").findOne({email: user.email})
@@ -103,21 +106,18 @@ const resolvers  = {
 
         createMatchPost: async (_,data,{db, user}) => {
 
-            // configure the dates
-            // insert players - player 1 and player 2. player 1 is the User that is currently signed In (getUserFromToken)
-            // How to get player 2? -- either through their username or email? how do we pass the data
-
             //current blockers
-                // how to handle relations between different collections? done for players
-                // group
                     // it needs to retrieve the group by fetching the group from the User collection
             
             console.log(data)
 
             if(!user) {throw new Error("Please sign in to submit a match result")}
 
+            //get grouping
+           
+
+            //get opponent user
             const opponent = await db.collection("Users").findOne({name: data.players[0]})
-            console.log(opponent)
 
             //decide winner, if total score of P1 > P2 ? P1 wins : P2 wins
             const userScore = data.firstSetScore[0] + data.secondSetScore[0]
@@ -127,7 +127,7 @@ const resolvers  = {
             
             let winner = userWin ? user : opponent
 
-            const post = {...data, players:[user,opponent], winner: winner}
+            const post = {...data, players:[user,opponent], winner: winner, group: group}
 
             console.log(post)
 
