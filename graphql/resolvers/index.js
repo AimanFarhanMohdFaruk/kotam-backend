@@ -111,10 +111,7 @@ const resolvers  = {
             
             console.log(data)
 
-            if(!user) {throw new Error("Please sign in to submit a match result")}
-
-            //get grouping
-           
+            if(!user) {throw new Error("Please sign in to submit a match result")}           
 
             //get opponent user
             const opponent = await db.collection("Users").findOne({name: data.players[0]})
@@ -127,7 +124,7 @@ const resolvers  = {
             
             let winner = userWin ? user : opponent
 
-            const post = {...data, players:[user,opponent], winner: winner, group: group}
+            const post = {...data, players:[user,opponent], winner: winner, group: user.group}
 
             console.log(post)
 
