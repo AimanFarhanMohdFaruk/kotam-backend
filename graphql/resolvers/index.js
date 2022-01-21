@@ -18,7 +18,7 @@ const resolvers  = {
     Query:{
         users: async (_,__, {db}) => {
             const users = await db.collection('Users').find().toArray()
-            console.log(users)
+
             if(!users) {throw new Error("Error in retrieving users")}
 
             return users;
@@ -36,7 +36,7 @@ const resolvers  = {
 
         user: async(_,id,{db}) => {
             const user = await db.collection("Users").findOne({_id: id})
-            console.log(user)
+
             if(!user) {throw new Error("Error retrieving user.")}
 
             return {
@@ -47,8 +47,9 @@ const resolvers  = {
 
     Mutation:{
         signUp: async (_, data, {db}) => {
+
             const hashedPassword = bcrypt.hashSync(data.password, 10)
-            const group = await db.collection("Group").findOne({groupName: data.group})
+            const group = await db.collection("Group").findOne({groupName: data.group}) //retrive group name from the form
 
 
             const user = {...data, password: hashedPassword, group: group}
@@ -106,11 +107,6 @@ const resolvers  = {
 
         createMatchPost: async (_,data,{db, user}) => {
 
-            //current blockers
-                    // it needs to retrieve the group by fetching the group from the User collection
-            
-            console.log(data)
-
             if(!user) {throw new Error("Please sign in to submit a match result")}           
 
             //get opponent user
@@ -124,9 +120,7 @@ const resolvers  = {
             
             let winner = userWin ? user : opponent
 
-            const post = {...data, players:[user,opponent], winner: winner, group: user.group}
-
-            console.log(post)
+            const post = {...data, players:[user,opponent], winner: winner, group: [user.group, opponent.group]}
 
             const insertPost = await db.collection('MatchPosts').insertOne(post)
 
@@ -142,10 +136,7 @@ const resolvers  = {
 
         createGroup: async (_,data,{db}) => {
 
-            const group = data
-            console.log(group)
-
-            const newGroup = await db.collection("Group").insertOne(group)
+            const newGroup = await db.collection("Group").insertOne(data)
 
             const returnNewGroup = await db.collection("Group").findOne({_id: ObjectID(newGroup.insertedId)})
 
