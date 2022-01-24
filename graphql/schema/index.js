@@ -1,7 +1,9 @@
 import {gql} from 'apollo-server'
 import { GraphQLScalarType, Kind } from 'graphql'
 
-
+// A note for creating mutations.
+    // Based on your schema type for example MatchPost, you have to return the corresponding object in this case a User.
+    // Meaning, when writing your mutation (createMatchPost), the winner argument is taking in a string which you would use to find and return the User in the Users collection.
 
 const typeDefs = gql`
 

@@ -34,8 +34,10 @@ const resolvers  = {
             return matches;
         },
 
-        user: async(_,id,{db}) => {
-            const user = await db.collection("Users").findOne({_id: id})
+        user: async(_,data,{db}) => {
+            console.log(data)
+
+            const user = await db.collection("Users").findOne({_id: data.id}).toArray()
 
             if(!user) {throw new Error("Error retrieving user.")}
 
@@ -50,7 +52,6 @@ const resolvers  = {
 
             const hashedPassword = bcrypt.hashSync(data.password, 10)
             const group = await db.collection("Group").findOne({groupName: data.group}) //retrive group name from the form
-
 
             const user = {...data, password: hashedPassword, group: group}
             
@@ -112,7 +113,6 @@ const resolvers  = {
             //get opponent user
             const opponent = await db.collection("Users").findOne({name: data.players[0]})
 
-            //decide winner, if total score of P1 > P2 ? P1 wins : P2 wins
             const userScore = data.firstSetScore[0] + data.secondSetScore[0]
             const opponentScore = data.firstSetScore[1] + data.secondSetScore[1]
 
@@ -125,8 +125,6 @@ const resolvers  = {
             const insertPost = await db.collection('MatchPosts').insertOne(post)
 
             const newPost = await db.collection('MatchPosts').findOne({_id: ObjectId(insertPost.insertedId)})
-
-            console.log(newPost)
 
             if(!newPost) {throw new Error("Failed to create post")}
 
