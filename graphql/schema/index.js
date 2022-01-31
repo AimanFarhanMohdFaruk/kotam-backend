@@ -11,6 +11,7 @@ const typeDefs = gql`
     
     type User {
         id: ID!
+        username: String!
         name: String!
         email: String!
         password: String!
@@ -32,6 +33,7 @@ const typeDefs = gql`
         firstSetScore: [Int]
         secondSetScore: [Int]
         winner: User
+        draw: Boolean
     }
 
     type Query {
@@ -51,12 +53,14 @@ const typeDefs = gql`
             firstSetScore: [Int]!,
             secondSetScore: [Int]!,
             winner: String
+            draw: Boolean
             ) : MatchPost
     }
 
     type Mutation {
         signUp(
         name: String!,
+        username: String!,
         email: String!,
         password: String!
         group: String

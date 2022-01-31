@@ -9,7 +9,7 @@ import { ObjectID } from 'bson'
 const resolvers  = {
     
     User: {
-        id: ({_id}) => _id || id //return _id 
+        id: ({_id}) => _id || id 
     },
 
     Date: dateScalar,
@@ -35,7 +35,6 @@ const resolvers  = {
         },
 
         user: async(_,data,{db}) => {
-            console.log(data)
 
             const user = await db.collection("Users").findOne({_id: data.id}).toArray()
 
@@ -60,9 +59,9 @@ const resolvers  = {
 
             if(existingUser) {throw new Error("A user with that email already exists. Please sign in")}
 
-            const nameTaken = await db.collection("Users").findOne({name: user.name})
+            const usernameTaken = await db.collection("Users").findOne({name: user.username})
 
-            if(nameTaken) {throw new Error("Username taken, please try a different username.")}
+            if(usernameTaken) {throw new Error("Username taken, please try a different username.")}
 
             //save to database
             const result = await db.collection('Users').insertOne(user)
@@ -111,16 +110,22 @@ const resolvers  = {
             if(!user) {throw new Error("Please sign in to submit a match result")}           
 
             //get opponent user
-            const opponent = await db.collection("Users").findOne({name: data.players[0]})
+            const opponent = await db.collection("Users").findOne({username: data.players[0]})
+
+            if(!opponent) {throw new Error ("Failed to retrieve opponent details. Please try again.")}
 
             const userScore = data.firstSetScore[0] + data.secondSetScore[0]
             const opponentScore = data.firstSetScore[1] + data.secondSetScore[1]
-
+            
             const userWin = userScore > opponentScore
             
             let winner = userWin ? user : opponent
+            
+            const draw = userScore === opponentScore
 
-            const post = {...data, players:[user,opponent], winner: winner, group: [user.group, opponent.group]}
+            const result = draw ? null : winner;
+
+            const post = {...data, players:[user,opponent], winner: result, draw: draw ,group: [user.group, opponent.group]}
 
             const insertPost = await db.collection('MatchPosts').insertOne(post)
 
