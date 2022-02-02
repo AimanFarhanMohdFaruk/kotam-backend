@@ -52,7 +52,7 @@ const resolvers  = {
             const hashedPassword = bcrypt.hashSync(data.password, 10)
             const group = await db.collection("Group").findOne({groupName: data.group}) //retrive group name from the form
 
-            const user = {...data, password: hashedPassword, group: group}
+            const user = {...data, password: hashedPassword, group: group, name:`${data.firstName} ${data.lastName}`}
             
             //check email
             const existingUser = await db.collection("Users").findOne({email: user.email})
